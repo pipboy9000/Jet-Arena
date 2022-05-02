@@ -128,9 +128,9 @@ public class ShipController : MonoBehaviour
 
         //wings
 
-        leftWing.localRotation = Quaternion.Lerp(leftWing.localRotation, Quaternion.Euler(strafe * 30, 0, 0), .1f);
+        leftWing.localRotation = Quaternion.Lerp(leftWing.localRotation, Quaternion.Euler(strafe * 30 + 30, 0, 0), .85f);
 
-        rightWing.localRotation = Quaternion.Lerp(rightWing.localRotation, Quaternion.Euler(-strafe * 30, 0, 0), .1f);
+        rightWing.localRotation = Quaternion.Lerp(rightWing.localRotation, Quaternion.Euler(-strafe * 30 + 30, 0, 0), .85f);
 
         //top wings
 

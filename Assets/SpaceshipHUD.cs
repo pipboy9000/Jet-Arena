@@ -46,8 +46,6 @@ public class SpaceshipHUD : MonoBehaviour
         float barsHeight = (-spaceshipHeight * 10) % 75;
         float textsHeight = (-spaceshipHeight * 10) % 100;
 
-        Debug.Log("spaceshipHeight: " + spaceshipHeight + "   textsHeight: " + textsHeight);
-
         float midHeight = Mathf.Floor(spaceshipHeight / 10) * 10;
 
         heightText1.text = midHeight + 10 + "";
