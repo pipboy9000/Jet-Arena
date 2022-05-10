@@ -20,6 +20,13 @@ public class ShipController : MonoBehaviour
     Transform leftCannon;
     Transform rightCannon;
     Transform currentCannonFire;
+
+    //tractor
+    Transform tractor;
+    public bool tractorOn = false;
+    public Transform tracPoint;
+    VisualEffect tractorParticles;
+
     public float fireRecoilDelay = 0.1f;
     float currentRecoilDelay = 0;
 
@@ -81,6 +88,10 @@ public class ShipController : MonoBehaviour
 
         rightCannonLight = transform.Find("Right Cannon Light").GetComponent<Light>();
         leftCannonLight = transform.Find("Left Cannon Light").GetComponent<Light>();
+
+        tractor = transform.Find("Tractor");
+        tractorParticles = tractor.Find("Particles").GetComponent<VisualEffect>();
+        tracPoint = tractor.Find("Trac Point");
     }
 
     void Fire()
@@ -112,6 +123,19 @@ public class ShipController : MonoBehaviour
             }
         }
 
+        //tractor beam
+        if (Input.GetMouseButtonDown(1))
+        {
+            tractorOn = true;
+            tractorParticles.Play();
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            tractorOn = false;
+            tractorParticles.Stop();
+        }
+
         currentRecoilDelay -= Time.deltaTime;
         rightCannonLight.intensity *= 0.85f;
         leftCannonLight.intensity *= 0.85f;
@@ -126,8 +150,13 @@ public class ShipController : MonoBehaviour
 
         mouseDy = Input.GetAxis("Mouse Y");
 
-        //wings
+        //Aim Rotation
+        aim.Rotate(new Vector3(mouseDy, mouseDx, 0f) * Time.deltaTime * lookSpeed);
 
+        aim.localRotation = Quaternion.Lerp(aim.localRotation, Quaternion.Euler(0f, 0f, 0f), 0.05f);
+
+
+        //wings
         leftWing.localRotation = Quaternion.Lerp(leftWing.localRotation, Quaternion.Euler(strafe * 30 + 30, 0, 0), .85f);
 
         rightWing.localRotation = Quaternion.Lerp(rightWing.localRotation, Quaternion.Euler(-strafe * 30 + 30, 0, 0), .85f);
@@ -138,34 +167,27 @@ public class ShipController : MonoBehaviour
         float leftTurnAmount = Mathf.Max(0, strafe);
         float angularSpeed = Mathf.Min(1.5f, m_Rigidbody.angularVelocity.magnitude);
 
-        float jitter = (acc / 5 + angularSpeed / 10) * (currentSpeed / 10) / 30;
-
-        //Debug.Log("angularSpeed: " + angularSpeed + "    jitter: " + jitter + "  acc: " + acc + "  speed: " + currentSpeed);
+        //Debug.Log("angularSpeed: " + angularSpeed  + "  acc: " + acc + "  speed: " + currentSpeed + "   strafe:" + strafe);
 
         topRightWing.localEulerAngles =
-            new Vector3(Mathf.PerlinNoise(Time.time * jitter, 0f) * (rightTurnAmount + 0.1f + acc + angularSpeed) * -30,
+            new Vector3(-strafe + acc + angularSpeed * -30,
             topRightWing.localEulerAngles.y,
             topRightWing.localEulerAngles.z);
 
         topLeftWing.localEulerAngles =
-            new Vector3(Mathf.PerlinNoise(Time.time * jitter, 0.3f) * (leftTurnAmount + 0.1f + acc + angularSpeed) * -30,
+            new Vector3(strafe + acc + angularSpeed * -30,
             topLeftWing.localEulerAngles.y,
             topLeftWing.localEulerAngles.z);
 
         //burner
         material.color = new Color(0, 1, 1) * (acc * 50 + 0.1f) * 5 * Mathf.PerlinNoise(Time.time * 50, 0);
-        burner.localScale = new Vector3(burner.localScale.x, burner.localScale.y, 1.1f + acc * 5 + currentSpeed / 50);
-
-        //Aim Rotation
-
-        aim.Rotate(new Vector3(mouseDy, mouseDx, 0f) * Time.deltaTime * lookSpeed);
-
-        aim.localRotation = Quaternion.Lerp(aim.localRotation, Quaternion.Euler(0f, 0f, 0f), 0.1f);
+        burner.localScale = new Vector3(burner.localScale.x, burner.localScale.y, acc + currentSpeed / 50);
 
         lookTarget = Vector3.Lerp(lookTarget, aim.transform.position + aim.transform.forward * 500, .1f);
 
         lookAt.position = lookTarget;
-    }
+
+        }
 
     private void FixedUpdate()
     {
@@ -186,6 +208,9 @@ public class ShipController : MonoBehaviour
         m_Rigidbody.AddRelativeTorque(new Vector3(aim.localRotation.x * turnSpeed, aim.localRotation.y * turnSpeed / 2, -strafe * spinSpeed),ForceMode.Acceleration);
 
         m_Rigidbody.AddForce(transform.forward * Mathf.Max(minSpeed, vertical * maxSpeed));
+
+        mouseDx = Mathf.Clamp(mouseDx, -.3f, .3f);
+        mouseDy = Mathf.Clamp(mouseDy, -.3f, .3f);
 
         //Crosshair
         RaycastHit rayHit;

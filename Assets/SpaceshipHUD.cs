@@ -57,11 +57,16 @@ public class SpaceshipHUD : MonoBehaviour
 
         texts.anchoredPosition = new Vector3(texts.anchoredPosition.x, textsHeight, 0);
 
-        crosshair.position = camera.WorldToScreenPoint(shipController.lookTarget);
+        crosshair.position = Vector3.Lerp(crosshair.position, camera.WorldToScreenPoint(shipController.lookTarget), 0.1f);
 
         if (shipController.hit)
         {
-            hitTarget.position = camera.WorldToScreenPoint(shipController.hitTarget);
+            if(hitTarget.position.x == -1000)
+            {
+                hitTarget.position = camera.WorldToScreenPoint(shipController.hitTarget);
+            }
+
+            hitTarget.position = Vector3.Lerp(hitTarget.position, camera.WorldToScreenPoint(shipController.hitTarget), 0.2f);
 
             float distance = Vector3.Distance(spaceship.transform.position, shipController.hitTarget);
 

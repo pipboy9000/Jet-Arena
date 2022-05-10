@@ -7,9 +7,12 @@ public class Laser : MonoBehaviour
 
     public GameObject explosion;
 
+    Rigidbody rgb;
+
     // Start is called before the first frame update
     void Start()
     {
+        rgb = GetComponent<Rigidbody>();
         Destroy(gameObject, 3f);
     }
 
@@ -21,14 +24,8 @@ public class Laser : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.position += transform.forward * Time.deltaTime * 300;
+        rgb.AddForce(transform.forward * Time.deltaTime * 900, ForceMode.Impulse);
     }
-
-    //void OnTriggerEnter(Collider other)
-    //{
-    //    Destroy(gameObject);
-    //    Instantiate(explosion, transform.position, transform.rotation);
-    //}
 
     private void OnCollisionEnter(Collision collision)
     {
