@@ -6,6 +6,10 @@ using UnityEngine.VFX;
 public class ShipController : MonoBehaviour
 {
 
+    public Transform ball;
+    Rigidbody ballRgb;
+    float ballEneregy = 0;
+
     Transform aim;
     Transform lookAt;
     public Vector3 lookTarget;
@@ -92,6 +96,8 @@ public class ShipController : MonoBehaviour
         tractor = transform.Find("Tractor");
         tractorParticles = tractor.Find("Particles").GetComponent<VisualEffect>();
         tracPoint = tractor.Find("Trac Point");
+
+        ballRgb = ball.GetComponent<Rigidbody>();
     }
 
     void Fire()
@@ -163,19 +169,16 @@ public class ShipController : MonoBehaviour
 
         //top wings
 
-        float rightTurnAmount = Mathf.Max(0, -strafe);
-        float leftTurnAmount = Mathf.Max(0, strafe);
         float angularSpeed = Mathf.Min(1.5f, m_Rigidbody.angularVelocity.magnitude);
-
-        //Debug.Log("angularSpeed: " + angularSpeed  + "  acc: " + acc + "  speed: " + currentSpeed + "   strafe:" + strafe);
+        float vel = m_Rigidbody.velocity.magnitude / 50;
 
         topRightWing.localEulerAngles =
-            new Vector3(-strafe + acc + angularSpeed * -30,
+            new Vector3((-strafe + acc + angularSpeed)/3 * -40 + (Mathf.PerlinNoise(Time.time,0) * 10),
             topRightWing.localEulerAngles.y,
             topRightWing.localEulerAngles.z);
 
         topLeftWing.localEulerAngles =
-            new Vector3(strafe + acc + angularSpeed * -30,
+            new Vector3((strafe + acc + angularSpeed)/3 * -40 + (Mathf.PerlinNoise(Time.time, 0) * 10),
             topLeftWing.localEulerAngles.y,
             topLeftWing.localEulerAngles.z);
 
@@ -225,6 +228,29 @@ public class ShipController : MonoBehaviour
 
             //No Hit
             hit = false;
+        }
+
+        if (tractorOn)
+        {
+            float distance = Vector3.Distance(tracPoint.position, ball.position);
+            Debug.Log(distance);
+
+            if (distance < 5)
+            {
+                ballRgb.MovePosition(tracPoint.position);
+                //Debug.Log("1");
+            }
+            else if (distance < 30)
+            {
+                ballRgb.MovePosition(Vector3.Lerp(ball.position, tracPoint.position, 0.15f));
+                //Debug.Log("2");
+            }
+            else if (distance < 300)
+            {
+                Vector3 pushVec = (tracPoint.position - ball.position);
+                ballRgb.AddForce(pushVec.normalized * 200, ForceMode.Acceleration);
+                //Debug.Log("3");
+            }
         }
     }
 }

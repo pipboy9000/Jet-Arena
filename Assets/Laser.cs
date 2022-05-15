@@ -29,7 +29,6 @@ public class Laser : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("hit");
         Destroy(gameObject);
         Instantiate(explosion, collision.contacts[0].point, transform.rotation);
     }
