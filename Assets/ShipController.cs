@@ -7,8 +7,10 @@ public class ShipController : MonoBehaviour
 {
 
     public Transform ball;
+    Ball ballScript;
     Rigidbody ballRgb;
     float ballEneregy = 0;
+    bool ballLocked = false;
 
     Transform aim;
     Transform lookAt;
@@ -98,6 +100,7 @@ public class ShipController : MonoBehaviour
         tracPoint = tractor.Find("Trac Point");
 
         ballRgb = ball.GetComponent<Rigidbody>();
+        ballScript = ball.GetComponent<Ball>();
     }
 
     void Fire()
@@ -138,6 +141,14 @@ public class ShipController : MonoBehaviour
 
         if (Input.GetMouseButtonUp(1))
         {
+            //shoot ball
+
+            if(ballLocked && ballScript.energy > 15)
+            {
+                ballScript.Shoot(aim.forward);
+            }
+
+            ballLocked = false;
             tractorOn = false;
             tractorParticles.Stop();
         }
@@ -190,7 +201,12 @@ public class ShipController : MonoBehaviour
 
         lookAt.position = lookTarget;
 
+        //charge ball energy
+        if (ballLocked && tractorOn)
+        {
+            ballScript.Charge(2500 * Time.deltaTime);
         }
+    }
 
     private void FixedUpdate()
     {
@@ -233,23 +249,23 @@ public class ShipController : MonoBehaviour
         if (tractorOn)
         {
             float distance = Vector3.Distance(tracPoint.position, ball.position);
-            Debug.Log(distance);
 
-            if (distance < 5)
+            if (distance < 10)
             {
-                ballRgb.MovePosition(tracPoint.position);
-                //Debug.Log("1");
+                ballLocked = true;
+                ballRgb.MovePosition(Vector3.Lerp(ball.position, tracPoint.position, 0.5f));
             }
-            else if (distance < 30)
+            else if (distance < 35)
             {
-                ballRgb.MovePosition(Vector3.Lerp(ball.position, tracPoint.position, 0.15f));
-                //Debug.Log("2");
-            }
-            else if (distance < 300)
-            {
-                Vector3 pushVec = (tracPoint.position - ball.position);
-                ballRgb.AddForce(pushVec.normalized * 200, ForceMode.Acceleration);
-                //Debug.Log("3");
+                ballLocked = true;
+                ballRgb.MovePosition(Vector3.Lerp(ball.position, tracPoint.position, 0.2f));
+            } else {
+                ballLocked = false;
+                if (distance < 300)
+                {
+                    Vector3 pushVec = (tracPoint.position - ball.position);
+                    ballRgb.AddForce(pushVec.normalized * 350, ForceMode.Acceleration);
+                }
             }
         }
     }
