@@ -67,6 +67,12 @@ public class ShipController : MonoBehaviour
     Light rightCannonLight;
     Light leftCannonLight;
 
+    Animator anim;
+
+    //double click detector for barrel roll
+    float aClickTime = 0;
+    float dClickTime = 0;
+
     public static float ConvertToAngle180(float input)
     {
         while (input > 360)
@@ -96,6 +102,7 @@ public class ShipController : MonoBehaviour
         m_Rigidbody.drag = 1;
 
         Transform ShipModel = transform.Find("Ship Model");
+        anim = ShipModel.GetComponent<Animator>();
         leftWing = ShipModel.Find("Left Wing");
         rightWing = ShipModel.Find("Right Wing");
         topRightWing = ShipModel.Find("Top Right Wing");
@@ -120,6 +127,8 @@ public class ShipController : MonoBehaviour
 
         ballRgb = ball.GetComponent<Rigidbody>();
         ballScript = ball.GetComponent<Ball>();
+
+
     }
 
     void Fire()
@@ -177,6 +186,31 @@ public class ShipController : MonoBehaviour
         rightCannonLight.intensity *= 0.85f;
         leftCannonLight.intensity *= 0.85f;
 
+        //barrel roll
+        if (Input.GetKeyDown("a"))
+        {
+            float currTime = Time.time;
+            //double click a
+            if(currTime - aClickTime < 0.5)
+            {
+                m_Rigidbody.AddForce(transform.right * -150, ForceMode.Impulse);
+                anim.SetTrigger("Spin Left");
+            }
+            aClickTime = currTime;
+        }  
+        
+        if (Input.GetKeyDown("d"))
+        {
+            float currTime = Time.time;
+            //double click a
+            if(currTime - dClickTime < 0.5)
+            {
+                m_Rigidbody.AddForce(transform.right * 150, ForceMode.Impulse);
+                anim.SetTrigger("Spin Right");
+            }
+            dClickTime = currTime;
+        }
+
         //Inputs
 
         vertical = Input.GetAxis("Vertical");
@@ -199,9 +233,6 @@ public class ShipController : MonoBehaviour
         rotY = Mathf.Clamp(rotY, -50, 50);
 
         aim.localRotation = Quaternion.Euler(rotX, rotY, 0);
-
-        Debug.Log(mouseDy);
-
 
         //ease back to center
         aim.localRotation = Quaternion.Lerp(aim.localRotation, Quaternion.Euler(0f, 0f, 0f), 0.1f);
