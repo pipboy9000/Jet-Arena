@@ -32,12 +32,10 @@ public class Ball : MonoBehaviour
     {
         if(energy > 0)
         {
-            energy *= 0.95f;
+            energy *= 0.93f;
         }
 
         shader.SetFloat("Glow", energy / 500);
-
-        Debug.Log(energy);
     }
 
     private void FixedUpdate()

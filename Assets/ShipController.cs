@@ -67,6 +67,25 @@ public class ShipController : MonoBehaviour
     Light rightCannonLight;
     Light leftCannonLight;
 
+    public static float ConvertToAngle180(float input)
+    {
+        while (input > 360)
+        {
+            input = input - 360;
+        }
+        while (input < -360)
+        {
+            input = input + 360;
+        }
+        if (input > 180)
+        {
+            input = input - 360;
+        }
+        if (input < -180)
+            input = 360 + input;
+        return input;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -145,6 +164,7 @@ public class ShipController : MonoBehaviour
 
             if(ballLocked && ballScript.energy > 15)
             {
+                //Vector3 shootVec = 
                 ballScript.Shoot(aim.forward);
             }
 
@@ -167,10 +187,24 @@ public class ShipController : MonoBehaviour
 
         mouseDy = Input.GetAxis("Mouse Y");
 
+
         //Aim Rotation
         aim.Rotate(new Vector3(mouseDy, mouseDx, 0f) * Time.deltaTime * lookSpeed);
 
-        aim.localRotation = Quaternion.Lerp(aim.localRotation, Quaternion.Euler(0f, 0f, 0f), 0.05f);
+        //limit rotation
+        float rotX = ConvertToAngle180(aim.localEulerAngles.x);
+        rotX = Mathf.Clamp(rotX, -50, 50);
+
+        float rotY = ConvertToAngle180(aim.localEulerAngles.y);
+        rotY = Mathf.Clamp(rotY, -50, 50);
+
+        aim.localRotation = Quaternion.Euler(rotX, rotY, 0);
+
+        Debug.Log(mouseDy);
+
+
+        //ease back to center
+        aim.localRotation = Quaternion.Lerp(aim.localRotation, Quaternion.Euler(0f, 0f, 0f), 0.1f);
 
 
         //wings
@@ -184,12 +218,12 @@ public class ShipController : MonoBehaviour
         float vel = m_Rigidbody.velocity.magnitude / 50;
 
         topRightWing.localEulerAngles =
-            new Vector3((-strafe + acc + angularSpeed)/3 * -40 + (Mathf.PerlinNoise(Time.time,0) * 10),
+            new Vector3((-strafe + acc + angularSpeed)/3 * -40 + (Mathf.PerlinNoise(Time.time,0) * 20),
             topRightWing.localEulerAngles.y,
             topRightWing.localEulerAngles.z);
 
         topLeftWing.localEulerAngles =
-            new Vector3((strafe + acc + angularSpeed)/3 * -40 + (Mathf.PerlinNoise(Time.time, 0) * 10),
+            new Vector3((strafe + acc + angularSpeed)/3 * -40 + (Mathf.PerlinNoise(Time.time, 0) * 20),
             topLeftWing.localEulerAngles.y,
             topLeftWing.localEulerAngles.z);
 
@@ -224,7 +258,7 @@ public class ShipController : MonoBehaviour
 
         //Ship Rotation
 
-        m_Rigidbody.AddRelativeTorque(new Vector3(aim.localRotation.x * turnSpeed, aim.localRotation.y * turnSpeed / 2, -strafe * spinSpeed),ForceMode.Acceleration);
+        m_Rigidbody.AddRelativeTorque(new Vector3(aim.localRotation.x * turnSpeed, aim.localRotation.y * turnSpeed / 3, -strafe * spinSpeed),ForceMode.Acceleration);
 
         m_Rigidbody.AddForce(transform.forward * Mathf.Max(minSpeed, vertical * maxSpeed));
 
@@ -250,14 +284,10 @@ public class ShipController : MonoBehaviour
         {
             float distance = Vector3.Distance(tracPoint.position, ball.position);
 
-            if (distance < 10)
+             if (distance < 35)
             {
                 ballLocked = true;
-                ballRgb.MovePosition(Vector3.Lerp(ball.position, tracPoint.position, 0.5f));
-            }
-            else if (distance < 35)
-            {
-                ballLocked = true;
+                ballRgb.velocity = ballRgb.velocity * .9f;
                 ballRgb.MovePosition(Vector3.Lerp(ball.position, tracPoint.position, 0.2f));
             } else {
                 ballLocked = false;
