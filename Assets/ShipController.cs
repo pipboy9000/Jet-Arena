@@ -195,8 +195,10 @@ public class ShipController : MonoBehaviour
             {
                 m_Rigidbody.AddForce(transform.right * -150, ForceMode.Impulse);
                 anim.SetTrigger("Spin Left");
+                aClickTime = 0;
+            } else {
+                aClickTime = currTime;
             }
-            aClickTime = currTime;
         }  
         
         if (Input.GetKeyDown("d"))
@@ -207,8 +209,10 @@ public class ShipController : MonoBehaviour
             {
                 m_Rigidbody.AddForce(transform.right * 150, ForceMode.Impulse);
                 anim.SetTrigger("Spin Right");
-            }
+                dClickTime = 0;
+            } else {
             dClickTime = currTime;
+            }
         }
 
         //Inputs
