@@ -24,7 +24,7 @@ public class Laser : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rgb.AddForce(transform.forward * Time.deltaTime * 900, ForceMode.Impulse);
+        rgb.AddForce(transform.forward * Time.deltaTime * 100, ForceMode.Impulse);
     }
 
     private void OnCollisionEnter(Collision collision)

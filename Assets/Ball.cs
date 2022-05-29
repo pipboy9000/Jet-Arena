@@ -24,18 +24,18 @@ public class Ball : MonoBehaviour
     void Start()
     {
         rgb = GetComponent<Rigidbody>();
-        shader = GetComponent<Renderer>().sharedMaterial;
+        //shader = GetComponent<Renderer>().sharedMaterial;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(energy > 0)
-        {
-            energy *= 0.93f;
-        }
+        //if(energy > 0)
+        //{
+        //    energy *= 0.93f;
+        //}
 
-        shader.SetFloat("Glow", energy / 500);
+        //shader.SetFloat("Glow", energy / 500);
     }
 
     private void FixedUpdate()

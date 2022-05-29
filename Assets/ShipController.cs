@@ -193,7 +193,7 @@ public class ShipController : MonoBehaviour
             //double click a
             if(currTime - aClickTime < 0.5)
             {
-                m_Rigidbody.AddForce(transform.right * -150, ForceMode.Impulse);
+                m_Rigidbody.AddForce(transform.right * -150, ForceMode.VelocityChange);
                 anim.SetTrigger("Spin Left");
                 aClickTime = 0;
             } else {
@@ -207,7 +207,7 @@ public class ShipController : MonoBehaviour
             //double click a
             if(currTime - dClickTime < 0.5)
             {
-                m_Rigidbody.AddForce(transform.right * 150, ForceMode.Impulse);
+                m_Rigidbody.AddForce(transform.right * 150, ForceMode.VelocityChange);
                 anim.SetTrigger("Spin Right");
                 dClickTime = 0;
             } else {
