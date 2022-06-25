@@ -44,7 +44,8 @@ public class ShipController : MonoBehaviour
     float mouseDy;
 
     public float turnSpeed = 5;
-    public float lookSpeed = 150;
+    public float lookSpeedX = 150;
+    public float lookSpeedY = 150;
     public float spinSpeed = 5;
     public float maxSpeed = 30;
     public float minSpeed = 10;
@@ -107,7 +108,7 @@ public class ShipController : MonoBehaviour
         rightWing = ShipModel.Find("Right Wing");
         topRightWing = ShipModel.Find("Top Right Wing");
         topLeftWing = ShipModel.Find("Top Left Wing");
-        burner = transform.Find("Burner");
+        burner = ShipModel.Find("Burner");
         engineParticles = transform.Find("Engine Particles").GetComponent<ParticleSystem>();
         burnerRenderer = burner.GetComponent<Renderer>();
         material = burnerRenderer.material;
@@ -221,13 +222,14 @@ public class ShipController : MonoBehaviour
 
         strafe = Input.GetAxis("Horizontal");
 
-        mouseDx = Input.GetAxis("Mouse X");
+        mouseDx = Input.GetAxis("Mouse X") / Screen.width * Time.deltaTime * 100; ;
 
-        mouseDy = Input.GetAxis("Mouse Y");
+        mouseDy = Input.GetAxis("Mouse Y") / Screen.height * Time.deltaTime * 100; ;
 
 
         //Aim Rotation
-        aim.Rotate(new Vector3(mouseDy, mouseDx, 0f) * Time.deltaTime * lookSpeed);
+        aim.Rotate(new Vector3(0f, mouseDx, 0f) * lookSpeedX);
+        aim.Rotate(new Vector3(mouseDy, 0f, 0f) * lookSpeedY);
 
         //limit rotation
         float rotX = ConvertToAngle180(aim.localEulerAngles.x);
@@ -243,9 +245,9 @@ public class ShipController : MonoBehaviour
 
 
         //wings
-        leftWing.localRotation = Quaternion.Lerp(leftWing.localRotation, Quaternion.Euler(strafe * 30 + 30, 0, 0), .85f);
+        leftWing.localRotation = Quaternion.Lerp(leftWing.localRotation, Quaternion.Euler(strafe * 30 + 30, 180, 0), .85f);
 
-        rightWing.localRotation = Quaternion.Lerp(rightWing.localRotation, Quaternion.Euler(-strafe * 30 + 30, 0, 0), .85f);
+        rightWing.localRotation = Quaternion.Lerp(rightWing.localRotation, Quaternion.Euler(-strafe * 30 + 30, 180, 0), .85f);
 
         //top wings
 
@@ -293,7 +295,7 @@ public class ShipController : MonoBehaviour
 
         //Ship Rotation
 
-        m_Rigidbody.AddRelativeTorque(new Vector3(aim.localRotation.x * turnSpeed, aim.localRotation.y * turnSpeed / 3, -strafe * spinSpeed),ForceMode.Acceleration);
+        m_Rigidbody.AddRelativeTorque(new Vector3(aim.localRotation.x * turnSpeed, aim.localRotation.y * turnSpeed, -strafe * spinSpeed),ForceMode.Acceleration);
 
         m_Rigidbody.AddForce(transform.forward * Mathf.Max(minSpeed, vertical * maxSpeed));
 
